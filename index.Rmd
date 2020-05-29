@@ -1,0 +1,35 @@
+---
+title: "Plotly Barplot - PV"
+author: "Lucas Teixeira"
+date: "28/05/2020"
+output: html_document
+---
+
+```{r, echo=F, message=F, warning = F}
+library(plotly)
+library(dplyr)
+```
+
+This barplot shows the total amount of PV power per state in Brazil.
+
+```{r, echo=F, message=F, warning = F}
+aneel <- read.csv("ANEEL2.csv",stringsAsFactors=F,fileEncoding="UTF-8")
+aneel$data <- as.Date(aneel$data,"%Y-%m-%d")
+
+
+summary <- aneel %>% 
+        group_by(uf)%>%
+        summarize(potencia = sum(potencia),qtde = n()) %>%
+        ungroup %>%
+        arrange(desc(potencia))
+
+
+summary$uf <- reorder(summary$uf,summary$potencia)
+                        
+plot_ly(summary,x=~potencia,y=~uf,type="bar")%>%
+        layout(
+                title = "Total PV Power by UF",
+                xaxis = list(title = "Power (kWp)"),
+                yaxis = list(title = "UF"))
+```
+
